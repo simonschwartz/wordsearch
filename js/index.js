@@ -2,9 +2,27 @@ const isEqual = require("lodash.isequal");
 const expects = require("./expects.js");
 
 function wordSearch(puzzle, ...words) {
-  // Add your code here
+    // Add your code here
+    const results = {};
 
-  return {};
+    const rows = puzzle.map(function (row) {
+        return row.join('');
+    });
+
+    words.forEach(function (word) {
+        for (let i = 0; i < rows.length; i++) {
+            const index = rows[i].indexOf(word);
+            if (index >= 0) {
+                results[word] = [
+                    [i, index],
+                    [i, index + word.length - 1]
+                ];
+                break;
+            }
+        }
+    });
+
+  return results;
 }
 
 const EASY_WORD_PUZZLE = [
