@@ -3,8 +3,64 @@ const expects = require("./expects.js");
 
 function wordSearch(puzzle, ...words) {
   // Add your code here
+  // Direction is stored as Y then X
+  var direction = [
+    [0, 1],
+    [1, 1],
+    [-1, 1],
+    [1, 0],
+  ];
+  var resultsArr = {};
 
-  return {};
+  words.forEach((word) => {
+    for (let indexY = 0; indexY < puzzle.length; indexY++) {
+      for (let indexX = 0; indexX < puzzle[indexY].length; indexX++) {
+        direction.forEach((element) => {
+          if (
+            validateWordFits(
+              element,
+              indexX,
+              indexY,
+              puzzle[indexY].length,
+              puzzle.length,
+              word.length
+            )
+          ) {
+            var start = [indexY, indexX];
+            var currentX = indexX;
+            var currentY = indexY;
+            var foundWordFlag = true;
+            for (let index = 0; index < word.length && foundWordFlag; index++) {
+              if (foundWordFlag) {
+                currentY = start[0] + index * element[0];
+                currentX = start[1] + index * element[1];
+              }
+              foundWordFlag = word.charAt(index) == puzzle[currentY][currentX];
+            }
+            if (foundWordFlag) {
+              resultsArr[word] = [start, [currentY, currentX]];
+            }
+          }
+        });
+      }
+    }
+  });
+
+  console.log(resultsArr);
+  return resultsArr;
+}
+
+function validateWordFits(
+  direction,
+  currentX,
+  currentY,
+  maxXLength,
+  maxYLength,
+  wordLength
+) {
+  var xMath = direction[1] * wordLength + currentX;
+  var yMath = direction[0] * wordLength + currentY;
+  return xMath <= maxXLength && yMath <= maxYLength && xMath >= 0 && yMath >= 0;
 }
 
 const EASY_WORD_PUZZLE = [
@@ -35,6 +91,7 @@ const HARD_WORD_PUZZLE = [
 ];
 
 // Test cases
+
 const easyPuzzleResult = wordSearch(
   EASY_WORD_PUZZLE,
   "humpty",
@@ -53,4 +110,44 @@ if (
   console.log("ERROR: Easy Puzzle failed");
   console.log("Expected:", expects.easyPuzzleExpected);
   console.log("Received:", easyPuzzleResult);
+}
+
+const mediumPuzzleResult = wordSearch(
+  MEDIUM_WORD_PUZZLE,
+  "humpty",
+  "bingo",
+  "bluey"
+);
+
+if (
+  isEqual(
+    wordSearch(MEDIUM_WORD_PUZZLE, "humpty", "bingo", "bluey"),
+    expects.mediumPuzzleExpected
+  )
+) {
+  console.log("SUCCESS: Medium puzzle solved");
+} else {
+  console.log("ERROR: Medium Puzzle failed");
+  console.log("Expected:", expects.mediumPuzzleExpected);
+  console.log("Received:", mediumPuzzleResult);
+}
+
+const hardPuzzleResult = wordSearch(
+  HARD_WORD_PUZZLE,
+  "humpty",
+  "bingo",
+  "bluey"
+);
+
+if (
+  isEqual(
+    wordSearch(HARD_WORD_PUZZLE, "humpty", "bingo", "bluey"),
+    expects.hardPuzzleExpected
+  )
+) {
+  console.log("SUCCESS: Hard puzzle solved");
+} else {
+  console.log("ERROR: Hard Puzzle failed");
+  console.log("Expected:", expects.hardPuzzleExpected);
+  console.log("Received:", hardPuzzleResult);
 }
