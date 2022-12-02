@@ -1,10 +1,116 @@
 const isEqual = require("lodash.isequal");
 const expects = require("./expects.js");
 
-function wordSearch(puzzle, ...words) {
-  // Add your code here
+const DIRECTIONS = {
+  0: { xOffset: 1, yOffset: 0},
+  45: { xOffset: 1, yOffset: -1},
+  90: { xOffset: 0, yOffset: -1},
+  135: { xOffset: -1, yOffset: -1},
+  180: { xOffset: -1, yOffset: 0},
+  225: { xOffset: -1, yOffset: 1},
+  270: { xOffset: 0, yOffset: 1},
+  315: { xOffset: 1, yOffset: 1}
+}
 
-  return {};
+function wordSearch(puzzle, ...words) {
+  const searchResults = {}
+  words.forEach(word => searchResults[word] = findWord(puzzle, word))
+  return searchResults
+}
+
+/**
+ * Scans an x by y puzzle for words.
+ * @param {string[][]} puzzle The puzzle to scan for a word.
+ * @param {string} word The word to find within the puzzle.
+ * @return {Number[2][2]} Returns the start and end coordinates if found,
+ *                        or undefined if not found.
+ */
+function findWord(puzzle, word) {
+  for (let y = 0, columnLength = puzzle.length; y < columnLength; y++)
+    for (let x = 0, rowLength = puzzle[y].length; x < rowLength; x++) {
+      const wordRow = getWordLine(puzzle, word, x, y)
+      if (wordRow)
+        return wordRow
+    }
+}
+
+/**
+ * Scans each applicable direction in the puzzle, starting at coordinates x,y
+ * for the word.
+ * @param {string[][]} puzzle The puzzle to scan for a word.
+ * @param {string} word The word to find within the puzzle.
+ * @param {*} x The x coordinate from which to assemble lines.
+ * @param {*} y The y coordinate from which to assemble lines.
+ * @return {{string: Number[2][2]}} Returns the start and end coordinates if found,
+ *                                  or undefined if not found.
+ */
+function getWordLine(puzzle, word, x, y) {
+  // We're choosing y, x as our puzzle is laid out in this space
+  const candidateLetter = puzzle[y][x]
+  const startingLetter = word.charAt(0)
+  
+  // Not an interesting letter to scan directions. Short-circuit here.
+  if (candidateLetter!==startingLetter)
+    return
+
+  const wordLength = word.length - 1
+  
+  const stringDirections = []
+  for (direction in DIRECTIONS) {
+    const candidateWord = getCandidateLine(puzzle, direction, x, y, wordLength)
+    if (candidateWord === word) {
+      const scanDirection = DIRECTIONS[direction]
+      // Reporting y, x as our expects is laid out in this space
+      const start = [ y, x ]
+      const end = [
+        y + scanDirection.yOffset * wordLength,
+        x + scanDirection.xOffset * wordLength
+      ]
+      return [start, end]
+    }
+  }
+}
+
+/**
+ * Builds an N-letter string out of a straight line in the puzzle, based on the
+ * directions specified in our DIRECTIONS constant above.
+ * @param {string[][]} puzzle The puzzle to scan for a word.
+ * @param {{number, number}} direction The offset of the next letter to fetch. 
+ * @param {number} x The current X coordinate in the puzzle to append.
+ * @param {number} y The current Y coordinate in the puzzle to append.
+ * @param {number} wordLengthRemaining The number of future characters to gather.
+ * @param {string} candidateString The string built so far from the line.
+ * @returns {string}  Returns the string formed from N number of letters in the
+ *                    specified direction within the puzzle
+ */
+function getCandidateLine(puzzle, direction, x, y, wordLengthRemaining, candidateString = "") {
+  // Short-circuit if this index does not exist in the puzzle
+  // and return undefined as because we haven't satisfied our word length
+  if (x < 0 || y < 0 || !puzzle[y] || !puzzle[y][x])
+    return
+  
+  // If this coordinate is valid, append this character to our candidate string
+  candidateString += puzzle[y][x]
+  
+  // Return here if we've found the right word length
+  if (wordLengthRemaining === 0)
+    return candidateString
+
+  // OR
+  // Figure out our next character to append based on the direction indicated
+  const scanDirection = DIRECTIONS[direction]
+  const xNext = x + scanDirection.xOffset
+  const yNext = y + scanDirection.yOffset
+  
+  // Append the next character in our line recursively
+  return getCandidateLine(
+    puzzle,
+    direction,
+    xNext,
+    yNext,
+    wordLengthRemaining - 1,
+    candidateString
+  )
 }
 
 const EASY_WORD_PUZZLE = [
@@ -53,4 +159,44 @@ if (
   console.log("ERROR: Easy Puzzle failed");
   console.log("Expected:", expects.easyPuzzleExpected);
   console.log("Received:", easyPuzzleResult);
+}
+
+const mediumPuzzleResult = wordSearch(
+  MEDIUM_WORD_PUZZLE,
+  "humpty",
+  "bingo",
+  "bluey"
+);
+
+if (
+  isEqual(
+    wordSearch(MEDIUM_WORD_PUZZLE, "humpty", "bingo", "bluey"),
+    expects.mediumPuzzleExpected
+  )
+) {
+  console.log("SUCCESS: Medium puzzle solved");
+} else {
+  console.log("ERROR: Medium Puzzle failed");
+  console.log("Expected:", expects.mediumPuzzleExpected);
+  console.log("Received:", mediumPuzzleResult);
+}
+
+const hardPuzzleResult = wordSearch(
+  HARD_WORD_PUZZLE,
+  "humpty",
+  "bingo",
+  "bluey"
+);
+
+if (
+  isEqual(
+    wordSearch(HARD_WORD_PUZZLE, "humpty", "bingo", "bluey"),
+    expects.hardPuzzleExpected
+  )
+) {
+  console.log("SUCCESS: Hard puzzle solved");
+} else {
+  console.log("ERROR: Hard Puzzle failed");
+  console.log("Expected:", expects.hardPuzzleExpected);
+  console.log("Received:", hardPuzzleResult);
 }
