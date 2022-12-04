@@ -28,9 +28,9 @@ function wordSearch(puzzle, ...words) {
 function findWord(puzzle, word) {
   for (let y = 0, columnLength = puzzle.length; y < columnLength; y++)
     for (let x = 0, rowLength = puzzle[y].length; x < rowLength; x++) {
-      const wordRow = getWordLine(puzzle, word, x, y)
-      if (wordRow)
-        return wordRow
+      const wordLine = getWordLine(puzzle, word, x, y)
+      if (wordLine)
+        return wordLine
     }
 }
 
