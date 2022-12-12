@@ -11,7 +11,7 @@ npm run start
 
 ## More Details
 
-For more details - see README [./js/README.md](README)
+For more details - see [README for solution in JS](./js/README.md)
 
 ## Description Of Challenge
 
