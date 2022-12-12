@@ -1,5 +1,16 @@
 # Word Search Challenge
 
+## Running This Solution
+
+To run the solution included in this update - from this directory:
+
+```
+cd js
+npm run start
+```
+
+## Description
+
 This challenge will require you to find words with a table of letters. The table is described as an array or arrays, where each array represents a row, and each item in the array represents a column eg:
 
 ```
