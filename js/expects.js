@@ -29,8 +29,8 @@ module.exports = {
   },
   hardPuzzleExpected: {
     humpty: [
-      [2, 1],
-      [2, 6],
+      [0, 8],
+      [5, 8],
     ],
     bluey: [
       [4, 3],
@@ -38,7 +38,21 @@ module.exports = {
     ],
     bingo: [
       [5, 1],
-      [1, 6],
+      [1, 5],
+    ],
+  },
+  extraHardPuzzleExpected: {
+    humpty: [
+      [5, 8],
+      [0, 8],
+    ],
+    bluey: [
+      [4, 7],
+      [4, 3],
+    ],
+    bingo: [
+      [1, 5],
+      [5, 1],
     ],
   },
 };
