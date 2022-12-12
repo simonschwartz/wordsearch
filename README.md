@@ -9,7 +9,11 @@ cd js
 npm run start
 ```
 
-## Description
+## More Details
+
+For more details - see README [./js/README.md](README)
+
+## Description Of Challenge
 
 This challenge will require you to find words with a table of letters. The table is described as an array or arrays, where each array represents a row, and each item in the array represents a column eg:
 
