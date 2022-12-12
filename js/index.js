@@ -64,7 +64,7 @@ function wordSearch(puzzle, ...words) {
 
               if (isSolution) {
                 // store "starting point" and "end point" as solution against word in return object
-                // NB: I had assumed in design that the points were in [x, y] format - bu it turns out it is in [y, x] format - so it needs to be sqapped at last moment
+                // NB: I had assumed in design that the points were in [x, y] format - bu it turns out it is in [y, x] format - so it needs to be swapped at last moment
                 // this could be tidied up if I had more time - i.e. you could design the whole thing to be [y, x] from the top down
                 returnResult[word] = [[startingPoint[1], startingPoint[0]], [currentCell[1], currentCell[0]]];
               };
