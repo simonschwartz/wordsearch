@@ -4,63 +4,83 @@ const expects = require("./expects.js");
 function wordSearch(puzzle, ...words) {
   // Add your code here
   // Direction is stored as Y then X
-  var direction = [
-    [0, 1],
-    [1, 1],
-    [-1, 1],
-    [1, 0],
+  // -1  search backwards
+  // 0 does nothing
+  // 1 search forwards
+  var directions = [
+    { y: 0, x: 1 },
+    { y: 1, x: 1 },
+    { y: -1, x: 1 },
+    { y: 1, x: 0 },
   ];
+  return wordSearchLoopBased(directions, puzzle, ...words);
+}
+
+function wordSearchLoopBased(directions, puzzle, ...words) {
   var resultsArr = {};
-
+  // Time complexity worst case per word is O(D*R-len(W)*C-len(W)*len(W)).
+  // D = Direction
+  // R = Row
+  // C = Column
+  // W = Word
   words.forEach((word) => {
-    for (let indexY = 0; indexY < puzzle.length; indexY++) {
-      for (let indexX = 0; indexX < puzzle[indexY].length; indexX++) {
-        direction.forEach((element) => {
-          if (
-            validateWordFits(
-              element,
-              indexX,
-              indexY,
-              puzzle[indexY].length,
-              puzzle.length,
-              word.length
-            )
-          ) {
-            var start = [indexY, indexX];
-            var currentX = indexX;
-            var currentY = indexY;
-            var foundWordFlag = true;
-            for (let index = 0; index < word.length && foundWordFlag; index++) {
-              if (foundWordFlag) {
-                currentY = start[0] + index * element[0];
-                currentX = start[1] + index * element[1];
-              }
-              foundWordFlag = word.charAt(index) == puzzle[currentY][currentX];
-            }
+    directions.forEach((direction) => {
+      let yValidLocations = identifyValidAxisStartEnd(
+        direction.y,
+        word.length,
+        puzzle.length
+      );
+      for (
+        let indexY = yValidLocations.start;
+        indexY < yValidLocations.end;
+        indexY++
+      ) {
+        let xValidLocations = identifyValidAxisStartEnd(
+          direction.x,
+          word.length,
+          puzzle[indexY].length
+        );
+        for (
+          let indexX = xValidLocations.start;
+          indexX < xValidLocations.end;
+          indexX++
+        ) {
+          var start = [indexY, indexX];
+          var currentX = indexX;
+          var currentY = indexY;
+          var foundWordFlag = true;
+          for (let index = 0; index < word.length && foundWordFlag; index++) {
             if (foundWordFlag) {
-              resultsArr[word] = [start, [currentY, currentX]];
+              currentY = start[0] + index * direction.y;
+              currentX = start[1] + index * direction.x;
             }
+            foundWordFlag = word.charAt(index) == puzzle[currentY][currentX];
           }
-        });
+          if (foundWordFlag) {
+            resultsArr[word] = [start, [currentY, currentX]];
+          }
+        }
       }
-    }
+    });
   });
-
-  console.log(resultsArr);
   return resultsArr;
 }
 
-function validateWordFits(
-  direction,
-  currentX,
-  currentY,
-  maxXLength,
-  maxYLength,
-  wordLength
-) {
-  var xMath = direction[1] * wordLength + currentX;
-  var yMath = direction[0] * wordLength + currentY;
-  return xMath <= maxXLength && yMath <= maxYLength && xMath >= 0 && yMath >= 0;
+/**
+ * Function uses math to identify valid locations a word can exist in within an array
+ *
+ * @param {*} axisDirection x or y expected values 1 0 -1
+ * @param {*} wordLength
+ * @param {*} arrLength row or column length
+ * @return {*}
+ */
+function identifyValidAxisStartEnd(axisDirection, wordLength, arrLength) {
+  let axisDirectionLength = axisDirection * wordLength;
+  let axisStartCalc = 0 - axisDirectionLength - 1;
+  let axisStart = 0 < axisStartCalc ? axisStartCalc : 0;
+  let axisEndCalc = arrLength - axisDirectionLength + 1;
+  let axisEnd = arrLength > axisEndCalc ? axisEndCalc : arrLength;
+  return { start: axisStart, end: axisEnd };
 }
 
 const EASY_WORD_PUZZLE = [
