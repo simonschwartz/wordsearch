@@ -123,6 +123,9 @@ const EXTRA_HARD_WORD_PUZZLE = [
   ["h", "o", "i", "b", "l", "u", "o", "z", "h", "e"],
 ];
 
+// TODO: these shoudl be turned in an array of cases and expectation
+// and looped through, rather than spelled out in long form
+
 // Test case - easy
 const easyPuzzleResult = wordSearch(
   EASY_WORD_PUZZLE,
