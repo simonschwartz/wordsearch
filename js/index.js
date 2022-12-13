@@ -13,7 +13,7 @@ var charPos = 0;
 var currentCellValue = "";
 
 function wordSearch(puzzle, ...words) {
-  const puzzleWidth = puzzle[0].length; // assume puzzle ot be rectangular
+  const puzzleWidth = puzzle[0].length; // assume puzzle is rectangular
   const puzzleHeight = puzzle.length;
 
   var currentXPos = 0;
