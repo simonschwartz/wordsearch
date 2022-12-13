@@ -123,89 +123,57 @@ const EXTRA_HARD_WORD_PUZZLE = [
   ["h", "o", "i", "b", "l", "u", "o", "z", "h", "e"],
 ];
 
-// TODO: these shoudl be turned in an array of cases and expectation
+// TODO: these should be turned into an array of cases and expectations
 // and looped through, rather than spelled out in long form
 
-// Test case - easy
-const easyPuzzleResult = wordSearch(
-  EASY_WORD_PUZZLE,
+const words = [
   "humpty",
   "bingo",
   "bluey"
-);
+];
 
-if (
-  isEqual(
-    wordSearch(EASY_WORD_PUZZLE, "humpty", "bingo", "bluey"),
-    expects.easyPuzzleExpected
-  )
-) {
-  console.log("SUCCESS: Easy puzzle solved");
-} else {
-  console.log("ERROR: Easy Puzzle failed");
-  console.log("Expected:", expects.easyPuzzleExpected);
-  console.log("Received:", easyPuzzleResult);
+const tests = [
+  {
+    description: "Easy",
+    puzzle: EASY_WORD_PUZZLE,
+    expected: expects.easyPuzzleExpected,
+  },
+  {
+    description: "Medium",
+    puzzle: MEDIUM_WORD_PUZZLE,
+    expected: expects.mediumPuzzleExpected,
+  },
+  {
+    description: "Hard",
+    puzzle: HARD_WORD_PUZZLE,
+    expected: expects.hardPuzzleExpected,
+  },
+  {
+    description: "Extra Hard",
+    puzzle: EXTRA_HARD_WORD_PUZZLE,
+    expected: expects.extraHardPuzzleExpected,
+  }
+]
+
+
+function runTest(item, _) {
+  const puzzleResult = wordSearch(
+    EASY_WORD_PUZZLE,
+    ...words
+  );
+
+  if (
+    isEqual(
+      wordSearch(item.puzzle, "humpty", "bingo", "bluey"),
+      item.expected,
+    )
+  ) {
+    console.log(`SUCCESS: ${item.description} puzzle solved`);
+  } else {
+    console.log(`ERROR: ${item.description} Puzzle failed`);
+    console.log("Expected:", item.expected);
+    console.log("Received:", puzzleResult);
+  }
 }
 
-// Test case - medium
-const mediumPuzzleResult = wordSearch(
-  MEDIUM_WORD_PUZZLE,
-  "humpty",
-  "bingo",
-  "bluey"
-);
-
-if (
-  isEqual(
-    wordSearch(MEDIUM_WORD_PUZZLE, "humpty", "bingo", "bluey"),
-    expects.mediumPuzzleExpected
-  )
-) {
-  console.log("SUCCESS: Medium puzzle solved");
-} else {
-  console.log("ERROR: Medium Puzzle failed");
-  console.log("Expected:", expects.mediumPuzzleExpected);
-  console.log("Received:", mediumPuzzleResult);
-}
-
-// Test case - hard
-const hardPuzzleResult = wordSearch(
-  HARD_WORD_PUZZLE,
-  "humpty",
-  "bingo",
-  "bluey"
-);
-
-if (
-  isEqual(
-    wordSearch(HARD_WORD_PUZZLE, "humpty", "bingo", "bluey"),
-    expects.hardPuzzleExpected
-  )
-) {
-  console.log("SUCCESS: Hard puzzle solved");
-} else {
-  console.log("ERROR: Hard Puzzle failed");
-  console.log("Expected:", expects.hardPuzzleExpected);
-  console.log("Received:", hardPuzzleResult);
-}
-
-// Test case - extra hard
-const extraHardPuzzleResult = wordSearch(
-  EXTRA_HARD_WORD_PUZZLE,
-  "humpty",
-  "bingo",
-  "bluey"
-);
-
-if (
-  isEqual(
-    wordSearch(EXTRA_HARD_WORD_PUZZLE, "humpty", "bingo", "bluey"),
-    expects.extraHardPuzzleExpected
-  )
-) {
-  console.log("SUCCESS: Extra Hard puzzle solved");
-} else {
-  console.log("ERROR: Extra Hard Puzzle failed");
-  console.log("Expected:", expects.extraHardPuzzleExpected);
-  console.log("Received:", extraHardPuzzleResult);
-}
+tests.forEach(runTest);
