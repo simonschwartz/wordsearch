@@ -4,42 +4,44 @@ const utils = require("./utils.js");
 
 const log = utils.debugLog;
 
+// init vars
+var returnResult = {};
+var directionName = "";
+var isSolution = true;
+var currentCell = [];
+var charPos = 0;
+var currentCellValue = "";
+
 function wordSearch(puzzle, ...words) {
-  log(`word search starting`, utils.logLevels.INFO);
+  const puzzleWidth = puzzle[0].length; // assume puzzle ot be rectangular
+  const puzzleHeight = puzzle.length;
 
-  // create return result
-  var returnResult = {};
-
-  // traverse each cell in puzzle table
-  var puzzleWidth = puzzle[0].length; // assume puzzle ot be rectangular
-  var puzzleHeight = puzzle.length;
-
-  log(`puzzleWidth: ${puzzleWidth} -- puzzleHeight: ${puzzleHeight}`, utils.logLevels.DEBUG);
-  
   var currentXPos = 0;
   var currentYPos = 0;
+
+  log(`word search starting`, utils.logLevels.INFO);
+
+  // traverse each cell in puzzle array
+  log(`puzzleWidth: ${puzzleWidth} -- puzzleHeight: ${puzzleHeight}`, utils.logLevels.DEBUG);
   while (currentYPos < puzzleHeight) {
     while (currentXPos < puzzleWidth) {
-      log(`checking position: ${currentXPos}, ${currentYPos}`, utils.logLevels.DEBUG);
-
-      var initCellValue = puzzle[currentYPos][currentXPos];
-
-      log(`initCellValue : ${initCellValue}`, utils.logLevels.DEBUG);
+      const initCellValue = puzzle[currentYPos][currentXPos];
+      log(`initCellValue : ${initCellValue} -- checking position: ${currentXPos}, ${currentYPos}`, utils.logLevels.DEBUG);
 
       // for each word in words
       words.forEach(function(word, _) {
         log(`word: ${word}`, utils.logLevels.DEBUG);
 
         // check whether cell is equal to first letter of word
-        if (word.charAt(0) == initCellValue) {
+        if (word.charAt(0) === initCellValue) {
           // if yes... store current cell values as current "starting point"
-          var startingPoint = [currentXPos, currentYPos];
+          const startingPoint = [currentXPos, currentYPos];
 
           log(`word: ${word} -- startingPoint: ${startingPoint}`, utils.logLevels.TRACE);
 
-          //for each direction defined...
-          for(var directionName in utils.directions) {
-            var direction = utils.directions[directionName];
+          //for each direction defined
+          for (directionName in utils.directions) {
+            const direction = utils.directions[directionName];
             log(`directionName: ${directionName}`, utils.logLevels.DEBUG);
 
             // check whether there is room in this direction to find solution
@@ -49,15 +51,14 @@ function wordSearch(puzzle, ...words) {
               // if yes the check each character in that direction, until one fails
               isSolution = true; // <--- assume solution is valid until proved otherwise
               currentCell = startingPoint;
-              for (var charPos = 1; charPos < word.length && isSolution; charPos++) {
+              for (charPos = 1; charPos < word.length && isSolution; charPos += 1) {
                 currentCell = direction.nextCell(currentCell);
                 log(`solution fits -- word: ${word} -- startingPoint: ${startingPoint} -- directionName: ${directionName} -- currentCell: ${currentCell}`, utils.logLevels.DEBUG);
                 currentCellValue = puzzle[currentCell[1]][currentCell[0]];
-                if (currentCell[0] < 0 || currentCell[1] < 0 || currentCell[0] >= puzzleWidth || currentCell[1] >= puzzleHeight || word.charAt(charPos) != currentCellValue) {
-                  isSolution = false;
-                  continue
-                };
-              };
+                if (currentCell[0] < 0 || currentCell[1] < 0 || currentCell[0] >= puzzleWidth || currentCell[1] >= puzzleHeight || word.charAt(charPos) !== currentCellValue) {
+                    isSolution = false;
+                }
+              }
 
               // if you get to end of word, store current cell as "end point"
               log(`charPos: ${charPos} -- word length: ${word.length}`, utils.logLevels.TRACE);
@@ -67,33 +68,32 @@ function wordSearch(puzzle, ...words) {
                 // NB: I had assumed in design that the points were in [x, y] format - bu it turns out it is in [y, x] format - so it needs to be swapped at last moment
                 // this could be tidied up if I had more time - i.e. you could design the whole thing to be [y, x] from the top down
                 returnResult[word] = [[startingPoint[1], startingPoint[0]], [currentCell[1], currentCell[0]]];
-              };
+              }
             } else {
-              log(`solution does not fit -- word: ${word} -- startingPoint: ${startingPoint} -- direction: ${directionName}`, utils.logLevels.TRACE);
+              log(`solution does not fit -- word: ${word} -- startingPoint: ${startingPoint} -- directionName: ${directionName}`, utils.logLevels.TRACE);
               // if no, stop this is not a solution
             }
-          };
-        } else {
-          // if no, stop this cell is not the start of a solution
+          }
         }
       });
-      currentXPos += 1;      
+      currentXPos += 1;
     }
     currentXPos = 0;
-    currentYPos += 1;      
+    currentYPos += 1;
   }
   log(`word search ending`, utils.logLevels.INFO);
 
   return returnResult;
 }
 
+// tests - puzzle 2D arrays
 const EASY_WORD_PUZZLE = [
   ["h", "b", "i", "n", "e", "a", "b", "c", "d", "e"],
   ["a", "b", "c", "b", "i", "n", "g", "o", "d", "e"],
   ["a", "h", "u", "m", "p", "t", "y", "o", "d", "e"],
   ["h", "b", "i", "n", "e", "a", "b", "c", "d", "e"],
   ["h", "b", "i", "b", "l", "u", "e", "y", "d", "e"],
-  ["h", "b", "i", "b", "l", "u", "o", "z", "d", "e"],
+  ["h", "b", "i", "b", "l", "u", "o", "z", "d", "e"]
 ];
 
 const MEDIUM_WORD_PUZZLE = [
@@ -102,7 +102,7 @@ const MEDIUM_WORD_PUZZLE = [
   ["a", "n", "u", "m", "p", "t", "y", "o", "m", "e"],
   ["h", "g", "i", "n", "e", "a", "b", "c", "p", "e"],
   ["h", "o", "i", "b", "l", "u", "e", "y", "t", "e"],
-  ["h", "b", "i", "b", "l", "u", "o", "z", "y", "e"],
+  ["h", "b", "i", "b", "l", "u", "o", "z", "y", "e"]
 ];
 
 const HARD_WORD_PUZZLE = [
@@ -111,7 +111,7 @@ const HARD_WORD_PUZZLE = [
   ["a", "g", "u", "m", "g", "t", "y", "o", "m", "e"],
   ["h", "g", "i", "n", "e", "a", "b", "c", "p", "e"],
   ["h", "o", "i", "b", "l", "u", "e", "y", "t", "e"],
-  ["h", "b", "i", "b", "l", "u", "o", "z", "y", "e"],
+  ["h", "b", "i", "b", "l", "u", "o", "z", "y", "e"]
 ];
 
 const EXTRA_HARD_WORD_PUZZLE = [
@@ -120,52 +120,50 @@ const EXTRA_HARD_WORD_PUZZLE = [
   ["a", "g", "u", "m", "i", "t", "y", "o", "p", "e"],
   ["h", "g", "i", "n", "e", "a", "b", "c", "m", "e"],
   ["h", "o", "g", "y", "e", "u", "l", "b", "u", "e"],
-  ["h", "o", "i", "b", "l", "u", "o", "z", "h", "e"],
+  ["h", "o", "i", "b", "l", "u", "o", "z", "h", "e"]
 ];
 
-// TODO: these should be turned into an array of cases and expectations
-// and looped through, rather than spelled out in long form
-
-const words = [
+// tests - words
+const testWords = [
   "humpty",
   "bingo",
   "bluey"
 ];
 
+// tests - list
 const tests = [
   {
     description: "Easy",
-    puzzle: EASY_WORD_PUZZLE,
     expected: expects.easyPuzzleExpected,
+    puzzle: EASY_WORD_PUZZLE
   },
   {
     description: "Medium",
-    puzzle: MEDIUM_WORD_PUZZLE,
     expected: expects.mediumPuzzleExpected,
+    puzzle: MEDIUM_WORD_PUZZLE
   },
   {
     description: "Hard",
-    puzzle: HARD_WORD_PUZZLE,
     expected: expects.hardPuzzleExpected,
+    puzzle: HARD_WORD_PUZZLE
   },
   {
     description: "Extra Hard",
-    puzzle: EXTRA_HARD_WORD_PUZZLE,
     expected: expects.extraHardPuzzleExpected,
+    puzzle: EXTRA_HARD_WORD_PUZZLE
   }
-]
+];
 
-
+// tests - run thwm
 function runTest(item, _) {
   const puzzleResult = wordSearch(
     EASY_WORD_PUZZLE,
-    ...words
+    ...testWords
   );
 
-  if (
-    isEqual(
+  if (isEqual(
       wordSearch(item.puzzle, "humpty", "bingo", "bluey"),
-      item.expected,
+      item.expected
     )
   ) {
     console.log(`SUCCESS: ${item.description} puzzle solved`);
