@@ -1,3 +1,7 @@
+// General ideas
+// Exit early - If we have found all words, immediately return the result
+// Avoid checking a word if we know it will be out-of-bounds
+
 use std::collections::HashMap;
 
 type WordPuzzle = [[char; 10]; 6];
