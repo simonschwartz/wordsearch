@@ -2,6 +2,8 @@ const isEqual = require('lodash.isequal');
 const expects = require('./expects.js');
 
 function wordSearch(puzzle, ...words) {
+	const puzzleWidth = puzzle[0].length;
+	const puzzleHeight = puzzle.length;
 	// Add your code here
 	// console.log('Hello puzzle>>>');
 	// console.log(puzzle);
@@ -33,8 +35,6 @@ function wordSearch(puzzle, ...words) {
 	if (wordsAfterHorizontalCheck.length > 0) {
 		for (i = 0; i < wordsAfterHorizontalCheck.length; i++) {
 			const currWord = wordsAfterHorizontalCheck[i];
-			const puzzleWidth = puzzle[0].length;
-			const puzzleHeight = puzzle.length;
 			for (j = 0; j < puzzleWidth; j++) {
 				const strArr = [];
 				for (k = 0; k < puzzleHeight; k++) {
@@ -64,39 +64,91 @@ function wordSearch(puzzle, ...words) {
 	if (wordsAfterVertialCheck.length > 0) {
 		for (i = 0; i < wordsAfterVertialCheck.length; i++) {
 			const currWord = wordsAfterVertialCheck[i];
-			const puzzleWidth = puzzle[0].length;
-			const puzzleHeight = puzzle.length;
+			let firstLetterIdxY = 0;
+			let firstLetterIdxX = 0;
+			let lastLetterIdxY = 0;
+			let lastLetterIdxX = 0;
 
 			for (j = 0; j < puzzleHeight; j++) {
-				const strArrDiagnalLeftFirst = [];
+				const strArrDiagnalAlongYAxisUpwards = [];
+				const strArrDiagnalAlongYAxisDownwards = [];
 				for (k = 0; k <= j; k++) {
-					if (k < puzzleWidth) strArrDiagnalLeftFirst.push(puzzle[j - k][k]);
+					if (k < puzzleWidth) {
+						strArrDiagnalAlongYAxisUpwards.push(puzzle[j - k][k]);
+						strArrDiagnalAlongYAxisDownwards.unshift(
+							puzzle[j - k][puzzleWidth - k - 1]
+						);
+					}
 				}
-				const text = strArrDiagnalLeftFirst.join('');
+				const textUpwards = strArrDiagnalAlongYAxisUpwards.join('');
+				const textDownwards = strArrDiagnalAlongYAxisDownwards.join('');
 
-				if (text.includes(currWord)) {
+				if (textUpwards.includes(currWord)) {
+					firstLetterIdxY = j - textUpwards.indexOf(currWord);
+					firstLetterIdxX = textUpwards.indexOf(currWord);
+					lastLetterIdxY = firstLetterIdxY - currWord.length + 1;
+					lastLetterIdxX = firstLetterIdxX + currWord.length - 1;
+
 					result[currWord] = [
-						[j - text.indexOf(currWord), text.indexOf(currWord)],
-						[
-							j - text.indexOf(currWord) - currWord.length + 1,
-							text.indexOf(currWord) + currWord.length - 1,
-						],
+						[firstLetterIdxY, firstLetterIdxX],
+						[lastLetterIdxY, lastLetterIdxX],
+					];
+					break;
+				}
+				if (textDownwards.includes(currWord)) {
+					firstLetterIdxY = j - textDownwards.indexOf(currWord) + 1;
+					firstLetterIdxX = puzzleWidth - j - 1 + textUpwards.indexOf(currWord);
+					lastLetterIdxY = firstLetterIdxY + currWord.length;
+					lastLetterIdxX = firstLetterIdxX + currWord.length;
+
+					result[currWord] = [
+						[firstLetterIdxY, firstLetterIdxX],
+						[lastLetterIdxY, lastLetterIdxX],
 					];
 					break;
 				}
 			}
 
 			for (j = 1; j < puzzleWidth; j++) {
-				const strArrDiagnalBtmFirst = [];
+				const strArrDiagnalAlongXAxisUpwards = [];
+				const strArrDiagnalAlongXAxisDownwards = [];
+
 				for (k = 0; k < puzzleHeight; k++) {
-					strArrDiagnalBtmFirst.push(puzzle[puzzleHeight - k - 1][j + k]);
+					if (j + k < puzzleWidth)
+						strArrDiagnalAlongXAxisUpwards.push(
+							puzzle[puzzleHeight - k - 1][j + k]
+						);
+					strArrDiagnalAlongXAxisDownwards.unshift(
+						puzzle[puzzleHeight - k - 1][puzzleWidth - j - k - 1]
+					);
 				}
-				const text = strArrDiagnalBtmFirst.join('');
-				// console.log('text diagnal >>> ', text);
-				if (text.includes(currWord)) {
+				const textUpwards = strArrDiagnalAlongXAxisUpwards.join('');
+				const textDownwards = strArrDiagnalAlongXAxisDownwards.join('');
+				// console.log('textUpwards ', textUpwards);
+				// console.log('textDownwards ', textDownwards);
+				if (textUpwards.includes(currWord)) {
+					firstLetterIdxY = puzzleHeight - textUpwards.indexOf(currWord) - 1;
+					firstLetterIdxX = j + textUpwards.indexOf(currWord);
+					lastLetterIdxY = puzzleHeight - firstLetterIdxY;
+					lastLetterIdxX = textUpwards.indexOf(currWord) + currWord.length;
+
 					result[currWord] = [
-						[k - 1, j],
-						[puzzleHeight - k + 1, text.indexOf(currWord) + currWord.length],
+						[firstLetterIdxY, firstLetterIdxX],
+						[lastLetterIdxY, lastLetterIdxX],
+					];
+					break;
+				}
+
+				if (textDownwards.includes(currWord)) {
+					firstLetterIdxY = textUpwards.indexOf(currWord);
+					firstLetterIdxX =
+						puzzleWidth - puzzleHeight - 1 + textUpwards.indexOf(currWord);
+					lastLetterIdxY = firstLetterIdxY + currWord.length;
+					lastLetterIdxX = firstLetterIdxX + currWord.length;
+
+					result[currWord] = [
+						[firstLetterIdxY, firstLetterIdxX],
+						[lastLetterIdxY, lastLetterIdxX],
 					];
 					break;
 				}
@@ -126,10 +178,10 @@ const MEDIUM_WORD_PUZZLE = [
 ];
 
 const HARD_WORD_PUZZLE = [
-	['h', 'b', 'i', 'n', 'e', 'a', 'b', 'c', 'h', 'e'],
-	['a', 'i', 'c', 'b', 'i', 'o', 'z', 'p', 'u', 'e'],
-	['a', 'g', 'u', 'm', 'g', 't', 'y', 'o', 'm', 'e'],
-	['h', 'g', 'i', 'n', 'e', 'a', 'b', 'c', 'p', 'e'],
+	['h', 'b', 'i', 't', 'e', 'a', 'b', 'c', 'h', 'e'],
+	['a', 'i', 's', 'b', 'i', 'o', 'z', 'p', 'u', 'e'],
+	['a', 'a', 'u', 'm', 'g', 't', 'y', 'o', 'm', 'e'],
+	['l', 'g', 'i', 'n', 'e', 'a', 'b', 'c', 'p', 'e'],
 	['h', 'o', 'i', 'b', 'l', 'u', 'e', 'y', 't', 'e'],
 	['h', 'b', 'i', 'b', 'l', 'u', 'o', 'z', 'y', 'e'],
 ];
