@@ -3,6 +3,7 @@
 // Avoid checking a word if we know it will be out-of-bounds
 
 use std::collections::HashMap;
+use std::time::Instant;
 
 type WordPuzzle = [[char; 10]; 6];
 
@@ -20,22 +21,11 @@ type SearchResult = [[usize; 2]; 2];
 fn find_words(puzzle: WordPuzzle, mut words: Vec<&str>) -> HashMap<String, SearchResult> {
     let mut results = HashMap::new();
 
-    // Measure how many loops our function performs to find all words
-    let mut loops: usize = 0;
-
     // scan the puzzle for letters that match the first character of the word we are searching for
     'scan: for row in 0..puzzle.len() {
-        loops = loops + 1;
         for col in 0..puzzle[row].len() {
-            loops = loops + 1;
-            // If we have found all words, then break the entire loop
-            if words.len() == 0 {
-                break 'scan;
-            }
-
             // Loop over each remaining word/s we are searching for
             for index in 0..words.len() {
-                loops = loops + 1;
                 let word = words[index];
                 let first_char = word.chars().nth(0).unwrap();
 
@@ -49,7 +39,6 @@ fn find_words(puzzle: WordPuzzle, mut words: Vec<&str>) -> HashMap<String, Searc
                         let mut found = true;
 
                         for (i, character) in char_vec.iter().enumerate() {
-                            loops = loops + 1;
                             // This just searches the word horizontally, would need to update to search in othe directions for harder puzzles
                             if puzzle[row][col + 1 + i] == *character {
                                 continue;
@@ -66,6 +55,11 @@ fn find_words(puzzle: WordPuzzle, mut words: Vec<&str>) -> HashMap<String, Searc
                                 String::from(word),
                                 [[row, col], [row, col + word.len() - 1]],
                             );
+
+                            // If we have found all words, then break the entire loop
+                            if words.len() == 0 {
+                                break 'scan;
+                            }
                             break;
                         }
                     }
@@ -78,17 +72,16 @@ fn find_words(puzzle: WordPuzzle, mut words: Vec<&str>) -> HashMap<String, Searc
         println!("Could not find all words. Remaining words: {:?}", words);
     }
 
-    println!("Performed {:?} loops to find all words", loops);
     return results;
 }
 
 fn main() {
-    use std::time::Instant;
     let now = Instant::now();
     let words = vec!["bluey", "bingo", "humpty"];
     let results = find_words(EASY_WORD_PUZZLE, words);
     println!("Results: {:?}", results);
     let elapsed = now.elapsed();
+    // 100 us = 0.0001 s
     println!("Elapsed: {:.2?}", elapsed);
 }
 
